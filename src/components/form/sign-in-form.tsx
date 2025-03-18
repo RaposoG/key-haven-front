@@ -30,7 +30,7 @@ export function SignInForm({ className, ...props }: React.ComponentPropsWithoutR
                 <div className="grid gap-2">
                   <div className="flex items-center">
                     <Label htmlFor="password">Password</Label>
-                    <Link to="#" className="ml-auto text-sm underline-offset-4 hover:underline">
+                    <Link to="/" className="ml-auto text-sm underline-offset-4 hover:underline">
                       Forgot your password?
                     </Link>
                   </div>
@@ -67,7 +67,7 @@ export function SignInForm({ className, ...props }: React.ComponentPropsWithoutR
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
-        By clicking continue, you agree to our <Link to="#">Terms of Service</Link> and <Link to="#">Privacy Policy</Link>.
+        By clicking continue, you agree to our <Link to="/">Terms of Service</Link> and <Link to="/">Privacy Policy</Link>.
       </div>
     </div>
   );

@@ -24,7 +24,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
             <div className="grid gap-6">
               <div className="grid gap-6">
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="email">Name</Label>
                   <Input id="name" type="text" placeholder="example more" required />
                 </div>
                 <div className="grid gap-2">
@@ -35,36 +35,10 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
                   <Label htmlFor="password">Password</Label>
                   <Input id="password" type="password" required />
                 </div>
-import { FormEvent, useState } from "react";
-// ...other imports
-
-export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
-  const [passwordError, setPasswordError] = useState("");
-
-  function handleSubmit(event: FormEvent) {
-    event.preventDefault();
-    const password = (event.target as HTMLFormElement).querySelector("#password") as HTMLInputElement;
-    const confirmPassword = (event.target as HTMLFormElement).querySelector("#confirm-password") as HTMLInputElement;
-    
-    if (password.value !== confirmPassword.value) {
-      setPasswordError("Passwords do not match");
-      return;
-    }
-    setPasswordError("");
-    // Process sign up data here
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className={className} {...props}>
-      {/* Other form fields, including the password input field with id="password" */}
-      <div className="grid gap-2">
-        <Label htmlFor="confirm-password">Confirm Password</Label>
-        <Input id="confirm-password" type="password" required />
-        {passwordError && <p className="text-sm text-red-500">{passwordError}</p>}
-      </div>
-    </form>
-  );
-}
+                <div className="grid gap-2">
+                  <Label htmlFor="confirm-password">Confirm Password</Label>
+                  <Input id="confirm-password" type="password" required />
+                </div>
                 <Button type="submit" className="w-full">
                   Sign Up
                 </Button>
@@ -96,7 +70,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
         </CardContent>
       </Card>
       <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
-        By signing up, you agree to our <Link to="#">Terms of Service</Link> and <Link to="#">Privacy Policy</Link>.
+        By signing up, you agree to our <Link to="/">Terms of Service</Link> and <Link to="/">Privacy Policy</Link>.
       </div>
     </div>
   );
