@@ -60,11 +60,11 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
               </div>
 
               <div className="flex flex-col gap-4">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" type="button">
                   <img src="/github.svg" alt="GitHub icon" className="h-8 w-8" />
                   {t("labels.sign-up.github")}
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" type="button">
                   <img src="/google.svg" alt="Google icon" className="h-8 w-8" />
                   {t("labels.sign-up.google")}
                 </Button>
