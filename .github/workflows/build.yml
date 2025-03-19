@@ -55,17 +55,18 @@ jobs:
 
       - name: Build Tauri App
         working-directory: ./
-        run: pnpm run tauri build -- --target ${{ matrix.platform.target }}
+        run: pnpm run tauri build --target ${{ matrix.platform.target }}
         env:
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
       - name: Debug target directory
         working-directory: ./
+        if: failure() # Only run if the build fails
         run: ls -la src-tauri/target/release/ || dir
 
       - name: Debug target-specific directory
-        if: matrix.platform.os == 'macos-latest'
+        if: matrix.platform.os == 'macos-latest' && failure() # Only run for macOS if the build fails
         working-directory: ./
         run: ls -la src-tauri/target/${{ matrix.platform.target }}/release/
 
@@ -94,9 +95,21 @@ jobs:
             echo "VERSION=0.1.0" >> $GITHUB_ENV
           fi
 
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') # Only run on tag pushes
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -105,10 +118,12 @@ jobs:
           draft: true
           prerelease: false
           files: |
-            src-tauri/target/${{ matrix.platform.target || 'release' }}/bundle/**/*.dmg
-            src-tauri/target/${{ matrix.platform.target || 'release' }}/bundle/**/*.app
-            src-tauri/target/${{ matrix.platform.target || 'release' }}/bundle/**/*.AppImage
-            src-tauri/target/${{ matrix.platform.target || 'release' }}/bundle/**/*.deb
-            src-tauri/target/${{ matrix.platform.target || 'release' }}/bundle/**/*.rpm
-            src-tauri/target/${{ matrix.platform.target || 'release' }}/bundle/**/*.exe
-            src-tauri/target/${{ matrix.platform.target || 'release' }}/bundle/**/*.msi
+            artifacts/tauri-app-ubuntu-latest-default/**/*.AppImage
+            artifacts/tauri-app-ubuntu-latest-default/**/*.deb
+            artifacts/tauri-app-ubuntu-latest-default/**/*.rpm
+            artifacts/tauri-app-macos-latest-x86_64-apple-darwin/**/*.dmg
+            artifacts/tauri-app-macos-latest-x86_64-apple-darwin/**/*.app
+            artifacts/tauri-app-macos-latest-aarch64-apple-darwin/**/*.dmg
+            artifacts/tauri-app-macos-latest-aarch64-apple-darwin/**/*.app
+            artifacts/tauri-app-windows-latest-default/**/*.exe
+            artifacts/tauri-app-windows-latest-default/**/*.msi
