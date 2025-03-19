@@ -150,12 +150,12 @@ jobs:
           draft: true
           prerelease: false
           files: |
-            artifacts/**/*.AppImage
-            artifacts/**/*.deb
-            artifacts/**/*.rpm
-            artifacts/**/*.exe
-            artifacts/**/*.msi
-            artifacts/**/*.dmg
-            artifacts/**/*.app.zip
+            src-tauri/target/${{ matrix.platform.target && format('{0}/release', matrix.platform.target) || 'release' }}/bundle/**/*.dmg
+            src-tauri/target/${{ matrix.platform.target && format('{0}/release', matrix.platform.target) || 'release' }}/bundle/**/*.app
+            src-tauri/target/${{ matrix.platform.target && format('{0}/release', matrix.platform.target) || 'release' }}/bundle/**/*.AppImage
+            src-tauri/target/${{ matrix.platform.target && format('{0}/release', matrix.platform.target) || 'release' }}/bundle/**/*.deb
+            src-tauri/target/${{ matrix.platform.target && format('{0}/release', matrix.platform.target) || 'release' }}/bundle/**/*.rpm
+            src-tauri/target/${{ matrix.platform.target && format('{0}/release', matrix.platform.target) || 'release' }}/bundle/**/*.exe
+            src-tauri/target/${{ matrix.platform.target && format('{0}/release', matrix.platform.target) || 'release' }}/bundle/**/*.msi
           generate_release_notes: true
           fail_on_unmatched_files: false
