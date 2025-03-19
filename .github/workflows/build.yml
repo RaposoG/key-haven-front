@@ -103,10 +103,22 @@ jobs:
             echo "VERSION=0.1.0" >> $GITHUB_ENV
           fi
 
+      - name: Create and push tag
+        if: github.ref == 'refs/heads/main' && matrix.platform.os == 'ubuntu-latest' # Run only on main and once (on Ubuntu)
+        shell: bash
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          TAG="v${{ env.VERSION }}"
+          git tag $TAG -f # -f to overwrite if it already exists
+          git push origin $TAG --force
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   release:
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/') # Still tied to tags
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
