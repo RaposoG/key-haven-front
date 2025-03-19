@@ -68,16 +68,6 @@ jobs:
           name: tauri-app-${{ matrix.os }}-${{ matrix.target || 'default' }}
           path: src-tauri/target/release/bundle/**
 
-      - name: Publish GitHub Release
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: v__VERSION__ # Substitui __VERSION__ pela versão do package.json
-          releaseName: "App v__VERSION__"
-          releaseBody: "Nova versão do app Vite + Tauri!"
-          releaseDraft: true # Mantém como rascunho até você publicar manualmente
-          prerelease: false
 
       - name: Get version
         run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
