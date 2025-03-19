@@ -1,9 +1,16 @@
 import { SignInForm } from "@/components/form/sign-in-form";
 import { LanguageSwitcher } from "@/components/language-switcher/language-switcher";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
+  beforeLoad: ({ context }) => {
+    if (context.auth.isAuthenticated) {
+      throw redirect({
+        to: "/app/dashboard",
+      });
+    }
+  }
 });
 
 function RouteComponent() {
