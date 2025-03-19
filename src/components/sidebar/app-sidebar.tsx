@@ -14,23 +14,23 @@ const data = {
   },
   navMain: [
     {
-      title: "Playground",
-      url: "#",
+      title: "Dashboard",
+      url: "/app/dashboard",
       icon: SquareTerminal,
     },
     {
-      title: "Models",
-      url: "#",
+      title: "Authentication",
+      url: "/app/authentication",
       icon: Bot,
     },
     {
-      title: "Documentation",
-      url: "#",
+      title: "storage",
+      url: "/app/storage",
       icon: BookOpen,
     },
     {
       title: "Settings",
-      url: "#",
+      url: "/app/settings",
       icon: Settings2,
     },
   ],
