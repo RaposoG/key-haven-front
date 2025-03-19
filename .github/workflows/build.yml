@@ -156,18 +156,12 @@ jobs:
           draft: true
           prerelease: false
           files: |
-            # macOS x86_64
-            src-tauri/target/x86_64-apple-darwin/release/bundle/macos/key-haven-front.app
-            src-tauri/target/x86_64-apple-darwin/release/bundle/dmg/key-haven-front_${{ env.VERSION }}_x64.dmg
-            # macOS aarch64
-            src-tauri/target/aarch64-apple-darwin/release/bundle/macos/key-haven-front.app
-            src-tauri/target/aarch64-apple-darwin/release/bundle/dmg/key-haven-front_${{ env.VERSION }}_aarch64.dmg
-            # Ubuntu
-            src-tauri/target/release/bundle/deb/key-haven-front_${{ env.VERSION }}_amd64.deb
-            src-tauri/target/release/bundle/rpm/key-haven-front-${{ env.VERSION }}-1.x86_64.rpm
-            src-tauri/target/release/bundle/appimage/key-haven-front_${{ env.VERSION }}_amd64.AppImage
-            # Windows
-            src-tauri/target/release/bundle/msi/key-haven-front_${{ env.VERSION }}_x64_en-US.msi
-            src-tauri/target/release/bundle/nsis/key-haven-front_${{ env.VERSION }}_x64-setup.exe
+            artifacts/**/*.app
+            artifacts/**/*.dmg
+            artifacts/**/*.deb
+            artifacts/**/*.rpm
+            artifacts/**/*.AppImage
+            artifacts/**/*.msi
+            artifacts/**/*.exe
           generate_release_notes: true
           fail_on_unmatched_files: false
