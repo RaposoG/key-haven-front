@@ -12,7 +12,9 @@ import { AuthProvider, useAuth } from "./context/auth-context";
 const router = createRouter({
   routeTree,
   context: {
-    auth: typeof useAuth
+    auth: {
+      isAuthenticated: false,
+    }
   },
 });
 
@@ -23,7 +25,9 @@ declare module "@tanstack/react-router" {
 }
 
 function InnerApp() {
-  const auth = useAuth();
+  const auth = {
+    isAuthenticated: useAuth().isAuthenticated
+  }
 
   return <RouterProvider router={router} context={{ auth }} />;
 }
