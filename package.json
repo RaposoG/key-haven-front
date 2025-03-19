@@ -35,7 +35,8 @@
     "react-i18next": "^15.4.1",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.14",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "tsparticles": "^3.8.1"
   },
   "devDependencies": {
     "@tanstack/react-router-devtools": "^1.114.24",
@@ -50,7 +51,12 @@
   },
   "pnpm": {
     "ignoredBuiltDependencies": [
-      "esbuild"
+      "esbuild",
+      "tsparticles"
+    ],
+    "onlyBuiltDependencies": [
+      "react-tsparticles",
+      "tsparticles-engine"
     ]
   }
 }
