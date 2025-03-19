@@ -55,33 +55,23 @@ jobs:
 
       - name: Build Tauri App
         working-directory: ./
-        run: pnpm run tauri build --target ${{ matrix.platform.target }}
+        run: pnpm run tauri build ${{ matrix.platform.target && format('-- --target {0}', matrix.platform.target) || '' }}
         env:
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-
-      - name: Debug target directory
-        working-directory: ./
-        if: failure() # Only run if the build fails
-        run: ls -la src-tauri/target/release/ || dir
-
-      - name: Debug target-specific directory
-        if: matrix.platform.os == 'macos-latest' && failure() # Only run for macOS if the build fails
-        working-directory: ./
-        run: ls -la src-tauri/target/${{ matrix.platform.target }}/release/
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: tauri-app-${{ matrix.platform.os }}-${{ matrix.platform.target || 'default' }}
           path: |
-            src-tauri/target/${{ matrix.platform.target || 'release' }}/bundle/**/*.dmg
-            src-tauri/target/${{ matrix.platform.target || 'release' }}/bundle/**/*.app
-            src-tauri/target/${{ matrix.platform.target || 'release' }}/bundle/**/*.AppImage
-            src-tauri/target/${{ matrix.platform.target || 'release' }}/bundle/**/*.deb
-            src-tauri/target/${{ matrix.platform.target || 'release' }}/bundle/**/*.rpm
-            src-tauri/target/${{ matrix.platform.target || 'release' }}/bundle/**/*.exe
-            src-tauri/target/${{ matrix.platform.target || 'release' }}/bundle/**/*.msi
+            src-tauri/target/release/bundle/**/*.dmg
+            src-tauri/target/release/bundle/**/*.app
+            src-tauri/target/release/bundle/**/*.AppImage
+            src-tauri/target/release/bundle/**/*.deb
+            src-tauri/target/release/bundle/**/*.rpm
+            src-tauri/target/release/bundle/**/*.exe
+            src-tauri/target/release/bundle/**/*.msi
           if-no-files-found: ignore
 
       - name: Extract version
@@ -121,9 +111,9 @@ jobs:
             artifacts/tauri-app-ubuntu-latest-default/**/*.AppImage
             artifacts/tauri-app-ubuntu-latest-default/**/*.deb
             artifacts/tauri-app-ubuntu-latest-default/**/*.rpm
+            artifacts/tauri-app-windows-latest-default/**/*.exe
+            artifacts/tauri-app-windows-latest-default/**/*.msi
             artifacts/tauri-app-macos-latest-x86_64-apple-darwin/**/*.dmg
             artifacts/tauri-app-macos-latest-x86_64-apple-darwin/**/*.app
             artifacts/tauri-app-macos-latest-aarch64-apple-darwin/**/*.dmg
             artifacts/tauri-app-macos-latest-aarch64-apple-darwin/**/*.app
-            artifacts/tauri-app-windows-latest-default/**/*.exe
-            artifacts/tauri-app-windows-latest-default/**/*.msi
