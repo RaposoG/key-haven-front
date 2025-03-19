@@ -1,89 +1,106 @@
-name: Build Vite Tauri App
+name: Build Tauri App
 
-# Quando a Action será executada
 on:
   push:
-    branches:
-      - main # Executa ao fazer push na branch main
+    branches: ["main"]
   pull_request:
-    branches:
-      - main # Executa em pull requests para a branch main
+    branches: ["main"]
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false # Não para todos os jobs se um falhar
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest] # Testa em Linux, macOS e Windows
-        include:
-          - os: macos-latest
-            target: "aarch64-apple-darwin" # Para Macs com Apple Silicon (M1/M2)
-          - os: macos-latest
-            target: "x86_64-apple-darwin" # Para Macs Intel
+        platform:
           - os: ubuntu-latest
-            target: "" # Sem target específico para Linux
+            target: ""
+          - os: macos-latest
+            target: "x86_64-apple-darwin"
+          - os: macos-latest
+            target: "aarch64-apple-darwin"
           - os: windows-latest
-            target: "" # Sem target específico para Windows
+            target: ""
+
+    runs-on: ${{ matrix.platform.os }}
 
     steps:
-      # Faz checkout do código
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Configura o Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18" # Ajuste conforme a versão usada no seu projeto
+          node-version: "18"
 
-      # Instala o pnpm globalmente
       - name: Install pnpm
-        run: npm install -g pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+          run_install: false
 
-      # Instala o Rust
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }} # Adiciona targets específicos (ex.: macOS)
+          targets: ${{ matrix.platform.target }}
 
-      # Instala dependências no Ubuntu
       - name: Install Linux dependencies
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.platform.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf
 
-      # Instala dependências do frontend (Vite) usando pnpm
       - name: Install frontend dependencies
+        working-directory: ./ui # Adjust this to your frontend directory path
         run: pnpm install
 
-      # Constrói o projeto Vite + Tauri usando pnpm
-      - name: Build Vite and Tauri
-        run: pnpm run tauri build -- --target ${{ matrix.target }}
+      - name: Build Tauri App
+        working-directory: ./ui # Adjust this to your frontend directory path
+        run: pnpm run tauri build ${{ matrix.platform.target && format('-- --target {0}', matrix.platform.target) || '' }}
         env:
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }} # Para assinar a build, se necessário
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
-      # (Opcional) Publica os artefatos
-      - name: Upload build artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: tauri-app-${{ matrix.os }}-${{ matrix.target || 'default' }}
-          path: src-tauri/target/release/bundle/**
+          name: tauri-app-${{ matrix.platform.os }}-${{ matrix.platform.target || 'default' }}
+          path: |
+            ./ui/src-tauri/target/release/bundle/**/*.dmg
+            ./ui/src-tauri/target/release/bundle/**/*.app
+            ./ui/src-tauri/target/release/bundle/**/*.AppImage
+            ./ui/src-tauri/target/release/bundle/**/*.deb
+            ./ui/src-tauri/target/release/bundle/**/*.rpm
+            ./ui/src-tauri/target/release/bundle/**/*.exe
+            ./ui/src-tauri/target/release/bundle/**/*.msi
+          if-no-files-found: ignore
 
-      # Extrai a versão do package.json
-      - name: Get version
-        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+      - name: Extract version
+        id: get_version
+        shell: bash
+        working-directory: ./ui # Adjust this to your frontend directory path
+        run: |
+          if [ -f "package.json" ]; then
+            echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+          else
+            echo "VERSION=0.1.0" >> $GITHUB_ENV
+          fi
 
-      # Publica uma release no GitHub
-      - name: Publish GitHub Release
-        uses: tauri-apps/tauri-action@v0
+      # This step will only run on tag pushes
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v${{ env.VERSION }}
-          releaseName: "App v${{ env.VERSION }}"
-          releaseBody: "Nova versão do app Vite + Tauri!"
-          releaseDraft: true
+          tag_name: v${{ env.VERSION }}
+          name: App v${{ env.VERSION }}
+          draft: true
           prerelease: false
+          files: |
+            ./ui/src-tauri/target/release/bundle/**/*.dmg
+            ./ui/src-tauri/target/release/bundle/**/*.app
+            ./ui/src-tauri/target/release/bundle/**/*.AppImage
+            ./ui/src-tauri/target/release/bundle/**/*.deb
+            ./ui/src-tauri/target/release/bundle/**/*.rpm
+            ./ui/src-tauri/target/release/bundle/**/*.exe
+            ./ui/src-tauri/target/release/bundle/**/*.msi
