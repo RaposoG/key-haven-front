@@ -50,11 +50,11 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf
 
       - name: Install frontend dependencies
-        working-directory: ./ui # Adjust this to your frontend directory path
+        working-directory: ./frontend
         run: pnpm install
 
       - name: Build Tauri App
-        working-directory: ./ui # Adjust this to your frontend directory path
+        working-directory: ./frontend
         run: pnpm run tauri build ${{ matrix.platform.target && format('-- --target {0}', matrix.platform.target) || '' }}
         env:
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
@@ -65,19 +65,19 @@ jobs:
         with:
           name: tauri-app-${{ matrix.platform.os }}-${{ matrix.platform.target || 'default' }}
           path: |
-            ./ui/src-tauri/target/release/bundle/**/*.dmg
-            ./ui/src-tauri/target/release/bundle/**/*.app
-            ./ui/src-tauri/target/release/bundle/**/*.AppImage
-            ./ui/src-tauri/target/release/bundle/**/*.deb
-            ./ui/src-tauri/target/release/bundle/**/*.rpm
-            ./ui/src-tauri/target/release/bundle/**/*.exe
-            ./ui/src-tauri/target/release/bundle/**/*.msi
+            ./frontend/src-tauri/target/release/bundle/**/*.dmg
+            ./frontend/src-tauri/target/release/bundle/**/*.app
+            ./frontend/src-tauri/target/release/bundle/**/*.AppImage
+            ./frontend/src-tauri/target/release/bundle/**/*.deb
+            ./frontend/src-tauri/target/release/bundle/**/*.rpm
+            ./frontend/src-tauri/target/release/bundle/**/*.exe
+            ./frontend/src-tauri/target/release/bundle/**/*.msi
           if-no-files-found: ignore
 
       - name: Extract version
         id: get_version
         shell: bash
-        working-directory: ./ui # Adjust this to your frontend directory path
+        working-directory: ./frontend
         run: |
           if [ -f "package.json" ]; then
             echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
@@ -85,7 +85,6 @@ jobs:
             echo "VERSION=0.1.0" >> $GITHUB_ENV
           fi
 
-      # This step will only run on tag pushes
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -97,10 +96,10 @@ jobs:
           draft: true
           prerelease: false
           files: |
-            ./ui/src-tauri/target/release/bundle/**/*.dmg
-            ./ui/src-tauri/target/release/bundle/**/*.app
-            ./ui/src-tauri/target/release/bundle/**/*.AppImage
-            ./ui/src-tauri/target/release/bundle/**/*.deb
-            ./ui/src-tauri/target/release/bundle/**/*.rpm
-            ./ui/src-tauri/target/release/bundle/**/*.exe
-            ./ui/src-tauri/target/release/bundle/**/*.msi
+            ./frontend/src-tauri/target/release/bundle/**/*.dmg
+            ./frontend/src-tauri/target/release/bundle/**/*.app
+            ./frontend/src-tauri/target/release/bundle/**/*.AppImage
+            ./frontend/src-tauri/target/release/bundle/**/*.deb
+            ./frontend/src-tauri/target/release/bundle/**/*.rpm
+            ./frontend/src-tauri/target/release/bundle/**/*.exe
+            ./frontend/src-tauri/target/release/bundle/**/*.msi
