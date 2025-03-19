@@ -55,7 +55,7 @@ jobs:
 
       - name: Build Tauri App
         working-directory: ./
-        shell: bash # Ensure Bash is used for consistency
+        shell: bash
         run: |
           if [ -n "${{ matrix.platform.target }}" ]; then
             pnpm run tauri build --target ${{ matrix.platform.target }}
@@ -67,15 +67,15 @@ jobs:
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
 
       - name: Debug target directory
-        if: failure() # Only run if the build fails
+        if: failure()
         working-directory: ./
-        shell: bash # Ensure Bash for Unix, fallback to dir for Windows
+        shell: bash
         run: ls -la src-tauri/target/release/ 2>/dev/null || dir src-tauri/target/release/
 
       - name: Debug target-specific directory
-        if: matrix.platform.os == 'macos-latest' && failure() # Only run for macOS if the build fails
+        if: matrix.platform.os == 'macos-latest' && failure()
         working-directory: ./
-        shell: bash # Ensure Bash for macOS
+        shell: bash
         run: ls -la src-tauri/target/${{ matrix.platform.target }}/release/
 
       - name: Upload artifacts
@@ -106,7 +106,7 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/') # Only run on tag pushes
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
