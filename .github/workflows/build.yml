@@ -68,7 +68,6 @@ jobs:
           name: tauri-app-${{ matrix.os }}-${{ matrix.target || 'default' }}
           path: src-tauri/target/release/bundle/**
 
-
       - name: Get version
         run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
