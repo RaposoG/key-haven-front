@@ -55,7 +55,12 @@ jobs:
 
       - name: Build Tauri App
         working-directory: ./
-        run: pnpm run tauri build --target ${{ matrix.platform.target }}
+        run: |
+          if [ -n "${{ matrix.platform.target }}" ]; then
+            pnpm run tauri build --target ${{ matrix.platform.target }}
+          else
+            pnpm run tauri build
+          fi
         env:
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
