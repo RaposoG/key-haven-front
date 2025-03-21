@@ -1,0 +1,1 @@
+export const ENTITY_METADATA_KEY = 'endpoint';

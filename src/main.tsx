@@ -3,12 +3,16 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import "./index.css";
 import "./i18n";
+import "reflect-metadata";
 
 import { routeTree } from "./routeTree.gen";
 import { ThemeProvider } from "./components/provider/theme-provider";
 import { LanguageProvider } from "./context/language-context";
 import { AuthProvider, useAuth } from "./context/auth-context";
 
+/**
+ * Criação do roteador com a árvore de rotas e o contexto
+ */
 const router = createRouter({
   routeTree,
   context: {
@@ -24,6 +28,9 @@ declare module "@tanstack/react-router" {
   }
 }
 
+/**
+ * Componente que encapsula a aplicação e provê o contexto
+ */
 function InnerApp() {
   const auth = {
     isAuthenticated: useAuth().isAuthenticated

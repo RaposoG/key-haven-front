@@ -1,56 +1,47 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { AuthContextType } from "./interfaces/auth-context.interface";
-import { AuthToken } from "./interfaces/auth-token.interface";
 import { LoginData } from "@/core/interfaces/auth.interface";
+import { useApi } from "@/hooks/http/useApi";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const api = useApi();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [token, setToken] = useState<AuthToken | null>(null);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setIsAuthenticated(true);
-      setToken(JSON.parse(storedToken)); 
-    }
+    checkAuthStatus();
   }, []);
 
-  //TODO: Implementar a lógica de login com requisição HTTP
-  const login = async (data: LoginData) => {
+  const checkAuthStatus = async () => {
     try {
-      console.log("Tentando fazer login...", data);
-
-      const mockResponse = {
-        token: "mock-token-123",
-        expiresIn: 3600,
-        user: {
-          id: "idididid",
-          name: "John Doe",
-        },
-      };
-
-      setTimeout(() => {
-        localStorage.setItem("token", JSON.stringify(mockResponse));
-        setIsAuthenticated(true);
-        setToken(mockResponse);
-
-        console.log("Login bem-sucedido", mockResponse);
-      }, 1000); 
+      await api.get("/auth/user"); 
+      setIsAuthenticated(true);
     } catch (error) {
-      console.error("Erro ao tentar fazer login", error);
+      setIsAuthenticated(false);
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setIsAuthenticated(false);
-    setToken(null);
+  const login = async (data: LoginData) => {
+    try {
+      await api.post("/auth/login", data);
+      setIsAuthenticated(true);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await api.post("/auth/logout");
+      setIsAuthenticated(false);
+    } catch (error) {
+      throw error;
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
